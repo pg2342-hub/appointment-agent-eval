@@ -1,0 +1,722 @@
+[
+ {
+  "id": 1,
+  "tier": "T1",
+  "title": "New delivery appointment; facility books by email; customer window open; all references present",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40101",
+     "facility": "CIN-RCV"
+    }
+   ]
+  },
+  "expected": {
+   "action": "book",
+   "load": "L-20401",
+   "appointments": [
+    {
+     "facility": "CIN-RCV",
+     "local": "2026-12-09T07:00"
+    }
+   ],
+   "channel": "email",
+   "notify": [
+    "carrier"
+   ],
+   "flags": []
+  }
+ },
+ {
+  "id": 2,
+  "tier": "T1",
+  "title": "New pickup appointment at a facility with a web scheduling portal",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "pickup",
+   "emails": [
+    {
+     "po": "PO-40102",
+     "facility": "COL-DC"
+    }
+   ]
+  },
+  "expected": {
+   "action": "book",
+   "load": "L-20402",
+   "appointments": [
+    {
+     "facility": "COL-DC",
+     "local": "2026-12-09T07:00"
+    }
+   ],
+   "channel": "portal",
+   "notify": [],
+   "flags": []
+  }
+ },
+ {
+  "id": 3,
+  "tier": "T1",
+  "title": "Delivery to a first-come, first-served receiver",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40103",
+     "facility": "LOU-FCFS"
+    }
+   ]
+  },
+  "expected": {
+   "action": "record_fcfs",
+   "load": "L-20403",
+   "facility": "LOU-FCFS",
+   "notify": [
+    "carrier"
+   ]
+  }
+ },
+ {
+  "id": 4,
+  "tier": "T1",
+  "title": "Phone-only facility, called during business hours",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40104",
+     "facility": "IND-WH"
+    }
+   ]
+  },
+  "expected": {
+   "action": "book",
+   "load": "L-20404",
+   "appointments": [
+    {
+     "facility": "IND-WH",
+     "local": "2026-12-09T08:00"
+    }
+   ],
+   "channel": "phone",
+   "notify": [],
+   "flags": []
+  }
+ },
+ {
+  "id": 5,
+  "tier": "T1",
+  "title": "Customer email already contains a booked appointment",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40105",
+     "facility": "CIN-RCV",
+     "existing_appt": "2026-12-09T10:00",
+     "confirmation": "CIN-55821"
+    }
+   ]
+  },
+  "expected": {
+   "action": "enter_existing",
+   "load": "L-20405",
+   "appointments": [
+    {
+     "facility": "CIN-RCV",
+     "local": "2026-12-09T10:00"
+    }
+   ],
+   "notify": []
+  }
+ },
+ {
+  "id": 6,
+  "tier": "T1",
+  "title": "Pickup and delivery both need appointments, 300 miles apart",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "both",
+   "emails": [
+    {
+     "po": "PO-40106",
+     "facility": "STL-DC"
+    }
+   ]
+  },
+  "expected": {
+   "action": "book",
+   "load": "L-20406",
+   "appointments": [
+    {
+     "facility": "MEM-SHIP",
+     "local": "2026-12-08T05:00"
+    },
+    {
+     "facility": "STL-DC",
+     "local": "2026-12-08T12:00"
+    }
+   ],
+   "channel": "email",
+   "notify": [],
+   "flags": []
+  }
+ },
+ {
+  "id": 7,
+  "tier": "T1",
+  "title": "Carrier already assigned when the appointment is confirmed",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40107",
+     "facility": "CIN-RCV"
+    }
+   ]
+  },
+  "expected": {
+   "action": "book",
+   "load": "L-20407",
+   "appointments": [
+    {
+     "facility": "CIN-RCV",
+     "local": "2026-12-09T07:00"
+    }
+   ],
+   "channel": "email",
+   "notify": [
+    "carrier"
+   ],
+   "flags": []
+  }
+ },
+ {
+  "id": 8,
+  "tier": "T2",
+  "title": "Request split across two emails; PO number only in the second",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "facility": "CIN-RCV"
+    },
+    {
+     "po": "PO-77120"
+    }
+   ]
+  },
+  "expected": {
+   "action": "book",
+   "load": "L-20408",
+   "appointments": [
+    {
+     "facility": "CIN-RCV",
+     "local": "2026-12-09T07:00"
+    }
+   ],
+   "channel": "email",
+   "notify": [],
+   "flags": []
+  }
+ },
+ {
+  "id": 9,
+  "tier": "T2",
+  "title": "Central-time pickup, Eastern-time delivery",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40109",
+     "facility": "CIN-RCV"
+    }
+   ]
+  },
+  "expected": {
+   "action": "book",
+   "load": "L-20409",
+   "appointments": [
+    {
+     "facility": "CIN-RCV",
+     "local": "2026-12-08T14:00"
+    }
+   ],
+   "channel": "email",
+   "notify": [],
+   "flags": []
+  }
+ },
+ {
+  "id": 10,
+  "tier": "T2",
+  "title": "Requested delivery date is a facility holiday closure",
+  "request": {
+   "received_at": "2026-12-21T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40110",
+     "facility": "ATL-DC"
+    }
+   ]
+  },
+  "expected": {
+   "action": "book",
+   "load": "L-20410",
+   "appointments": [
+    {
+     "facility": "ATL-DC",
+     "local": "2026-12-28T07:00"
+    }
+   ],
+   "channel": "email",
+   "notify": [
+    "ae"
+   ],
+   "flags": [
+    "holiday"
+   ]
+  }
+ },
+ {
+  "id": 11,
+  "tier": "T2",
+  "title": "Check call shows the carrier running 3 hours late",
+  "request": {
+   "received_at": "2026-12-09T05:30-05:00",
+   "intent": "appointment",
+   "kind": "reschedule",
+   "stop": "delivery",
+   "check_call_eta": "2026-12-09T10:00-05:00",
+   "emails": [
+    {
+     "po": "PO-40111",
+     "facility": "CIN-RCV"
+    }
+   ]
+  },
+  "expected": {
+   "action": "book",
+   "load": "L-20411",
+   "appointments": [
+    {
+     "facility": "CIN-RCV",
+     "local": "2026-12-09T10:00"
+    }
+   ],
+   "channel": "email",
+   "notify": [
+    "ae",
+    "carrier"
+   ],
+   "flags": []
+  }
+ },
+ {
+  "id": 12,
+  "tier": "T2",
+  "title": "Facility requires 48 hours notice; request arrives same day",
+  "request": {
+   "received_at": "2026-12-08T06:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40112",
+     "facility": "NSH-DC"
+    }
+   ]
+  },
+  "expected": {
+   "action": "book",
+   "load": "L-20412",
+   "appointments": [
+    {
+     "facility": "NSH-DC",
+     "local": "2026-12-10T07:00"
+    }
+   ],
+   "channel": "email",
+   "notify": [
+    "ae"
+   ],
+   "flags": [
+    "notice"
+   ]
+  }
+ },
+ {
+  "id": 13,
+  "tier": "T2",
+  "title": "Portal returns an error on booking",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40113",
+     "facility": "KNX-DC"
+    }
+   ]
+  },
+  "expected": {
+   "action": "book",
+   "load": "L-20413",
+   "appointments": [
+    {
+     "facility": "KNX-DC",
+     "local": "2026-12-09T07:00"
+    }
+   ],
+   "channel": "email",
+   "notify": [],
+   "flags": [],
+   "attempts": [
+    "portal",
+    "portal",
+    "email"
+   ]
+  },
+  "facility_response": {
+   "portal_errors": 2
+  }
+ },
+ {
+  "id": 14,
+  "tier": "T2",
+  "title": "Facility counter-offers a different slot inside the window",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40114",
+     "facility": "CLE-DC"
+    }
+   ]
+  },
+  "expected": {
+   "action": "book",
+   "load": "L-20414",
+   "appointments": [
+    {
+     "facility": "CLE-DC",
+     "local": "2026-12-09T11:00"
+    }
+   ],
+   "channel": "email",
+   "notify": [],
+   "flags": []
+  },
+  "facility_response": {
+   "counter_offer": "2026-12-09T11:00"
+  }
+ },
+ {
+  "id": 15,
+  "tier": "T2",
+  "title": "Request uses the customer's PO; TMS stores the load by Integrity's load number",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "4500123981",
+     "facility": "CIN-RCV"
+    }
+   ]
+  },
+  "expected": {
+   "action": "book",
+   "load": "L-20415",
+   "appointments": [
+    {
+     "facility": "CIN-RCV",
+     "local": "2026-12-09T07:00"
+    }
+   ],
+   "channel": "email",
+   "notify": [],
+   "flags": []
+  }
+ },
+ {
+  "id": 16,
+  "tier": "T3",
+  "title": "Only slots available fall outside the customer window",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40116",
+     "facility": "TPA-DC"
+    }
+   ]
+  },
+  "expected": {
+   "action": "handoff",
+   "to": "coordinator",
+   "reason": "no_slot_in_window",
+   "load": "L-20416"
+  }
+ },
+ {
+  "id": 17,
+  "tier": "T3",
+  "title": "Delivery date in the customer email conflicts with the TMS",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40117",
+     "facility": "CLE-DC",
+     "requested_date": "2026-12-11"
+    }
+   ]
+  },
+  "expected": {
+   "action": "handoff",
+   "to": "ae",
+   "reason": "date_conflict",
+   "load": "L-20417"
+  }
+ },
+ {
+  "id": 18,
+  "tier": "T3",
+  "title": "A reschedule would make the load late to the final receiver",
+  "request": {
+   "received_at": "2026-12-09T05:30-05:00",
+   "intent": "appointment",
+   "kind": "reschedule",
+   "stop": "delivery",
+   "check_call_eta": "2026-12-09T13:00-05:00",
+   "emails": [
+    {
+     "po": "PO-40118",
+     "facility": "CIN-RCV"
+    }
+   ]
+  },
+  "expected": {
+   "action": "handoff",
+   "to": "coordinator",
+   "reason": "late_to_receiver",
+   "load": "L-20418"
+  }
+ },
+ {
+  "id": 19,
+  "tier": "T3",
+  "title": "Facility asks for a driver-assist or lumper detail not in the load record",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40119",
+     "facility": "DEN-DC"
+    }
+   ]
+  },
+  "expected": {
+   "action": "handoff",
+   "to": "coordinator",
+   "reason": "facility_question",
+   "load": "L-20419"
+  },
+  "facility_response": {
+   "question": "Driver assist or lumper?"
+  }
+ },
+ {
+  "id": 20,
+  "tier": "T3",
+  "title": "Two Integrity loads at the same facility, one dock slot left",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40121",
+     "facility": "CHS-DC"
+    },
+    {
+     "po": "PO-40122",
+     "facility": "CHS-DC"
+    }
+   ]
+  },
+  "expected": {
+   "action": "handoff",
+   "to": "coordinator",
+   "reason": "competing_loads",
+   "load": "L-20421"
+  }
+ },
+ {
+  "id": 21,
+  "tier": "T3",
+  "title": "Receiver says the PO is not in its system",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40123",
+     "facility": "ORL-DC"
+    }
+   ]
+  },
+  "expected": {
+   "action": "handoff",
+   "to": "ae",
+   "reason": "po_not_found",
+   "load": "L-20423"
+  },
+  "facility_response": {
+   "po_not_found": true
+  }
+ },
+ {
+  "id": 22,
+  "tier": "T4",
+  "title": "Customer complains about a missed appointment and a detention charge",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "complaint",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40124",
+     "facility": "DAY-DC"
+    }
+   ]
+  },
+  "expected": {
+   "action": "handoff",
+   "to": "coordinator",
+   "reason": "out_of_scope",
+   "load": "L-20424"
+  }
+ },
+ {
+  "id": 23,
+  "tier": "T4",
+  "title": "Carrier asks about rate or an accessorial charge",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "rate_question",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40125",
+     "facility": "DAY-DC"
+    }
+   ]
+  },
+  "expected": {
+   "action": "handoff",
+   "to": "coordinator",
+   "reason": "out_of_scope",
+   "load": "L-20425"
+  }
+ },
+ {
+  "id": 24,
+  "tier": "T4",
+  "title": "Customer asks to change the delivery address",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "address_change",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40126",
+     "facility": "DAY-DC"
+    }
+   ]
+  },
+  "expected": {
+   "action": "handoff",
+   "to": "ae",
+   "reason": "changes_load",
+   "load": "L-20426"
+  }
+ },
+ {
+  "id": 25,
+  "tier": "T4",
+  "title": "Hazmat load with special facility instructions",
+  "request": {
+   "received_at": "2026-12-07T08:00-06:00",
+   "intent": "appointment",
+   "kind": "new",
+   "stop": "delivery",
+   "emails": [
+    {
+     "po": "PO-40127",
+     "facility": "DAY-DC"
+    }
+   ]
+  },
+  "expected": {
+   "action": "handoff",
+   "to": "coordinator",
+   "reason": "hazmat",
+   "load": "L-20427"
+  }
+ }
+]

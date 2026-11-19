@@ -1,0 +1,260 @@
+{
+ "summary": {
+  "passed": 4,
+  "total": 25,
+  "t12": 4,
+  "t12_n": 15,
+  "t34": 0,
+  "t34_n": 10,
+  "critical": 19,
+  "gate": false
+ },
+ "cases": [
+  {
+   "id": 1,
+   "tier": "T1",
+   "title": "New delivery appointment; facility books by email; customer window open; all references present",
+   "passed": true,
+   "errors": [],
+   "critical": false
+  },
+  {
+   "id": 2,
+   "tier": "T1",
+   "title": "New pickup appointment at a facility with a web scheduling portal",
+   "passed": true,
+   "errors": [],
+   "critical": false
+  },
+  {
+   "id": 3,
+   "tier": "T1",
+   "title": "Delivery to a first-come, first-served receiver",
+   "passed": false,
+   "errors": [
+    "E1"
+   ],
+   "critical": false
+  },
+  {
+   "id": 4,
+   "tier": "T1",
+   "title": "Phone-only facility, called during business hours",
+   "passed": true,
+   "errors": [],
+   "critical": false
+  },
+  {
+   "id": 5,
+   "tier": "T1",
+   "title": "Customer email already contains a booked appointment",
+   "passed": false,
+   "errors": [
+    "E3"
+   ],
+   "critical": true
+  },
+  {
+   "id": 6,
+   "tier": "T1",
+   "title": "Pickup and delivery both need appointments, 300 miles apart",
+   "passed": false,
+   "errors": [
+    "E3"
+   ],
+   "critical": true
+  },
+  {
+   "id": 7,
+   "tier": "T1",
+   "title": "Carrier already assigned when the appointment is confirmed",
+   "passed": true,
+   "errors": [],
+   "critical": false
+  },
+  {
+   "id": 8,
+   "tier": "T2",
+   "title": "Request split across two emails; PO number only in the second",
+   "passed": false,
+   "errors": [
+    "E2",
+    "E3"
+   ],
+   "critical": true
+  },
+  {
+   "id": 9,
+   "tier": "T2",
+   "title": "Central-time pickup, Eastern-time delivery",
+   "passed": false,
+   "errors": [
+    "E3"
+   ],
+   "critical": true
+  },
+  {
+   "id": 10,
+   "tier": "T2",
+   "title": "Requested delivery date is a facility holiday closure",
+   "passed": false,
+   "errors": [
+    "E1",
+    "E3"
+   ],
+   "critical": true
+  },
+  {
+   "id": 11,
+   "tier": "T2",
+   "title": "Check call shows the carrier running 3 hours late",
+   "passed": false,
+   "errors": [
+    "E3"
+   ],
+   "critical": true
+  },
+  {
+   "id": 12,
+   "tier": "T2",
+   "title": "Facility requires 48 hours notice; request arrives same day",
+   "passed": false,
+   "errors": [
+    "E1",
+    "E3"
+   ],
+   "critical": true
+  },
+  {
+   "id": 13,
+   "tier": "T2",
+   "title": "Portal returns an error on booking",
+   "passed": false,
+   "errors": [
+    "E5"
+   ],
+   "critical": false
+  },
+  {
+   "id": 14,
+   "tier": "T2",
+   "title": "Facility counter-offers a different slot inside the window",
+   "passed": false,
+   "errors": [
+    "E3"
+   ],
+   "critical": true
+  },
+  {
+   "id": 15,
+   "tier": "T2",
+   "title": "Request uses the customer's PO; TMS stores the load by Integrity's load number",
+   "passed": false,
+   "errors": [
+    "E2",
+    "E3"
+   ],
+   "critical": true
+  },
+  {
+   "id": 16,
+   "tier": "T3",
+   "title": "Only slots available fall outside the customer window",
+   "passed": false,
+   "errors": [
+    "E4"
+   ],
+   "critical": true
+  },
+  {
+   "id": 17,
+   "tier": "T3",
+   "title": "Delivery date in the customer email conflicts with the TMS",
+   "passed": false,
+   "errors": [
+    "E4"
+   ],
+   "critical": true
+  },
+  {
+   "id": 18,
+   "tier": "T3",
+   "title": "A reschedule would make the load late to the final receiver",
+   "passed": false,
+   "errors": [
+    "E4"
+   ],
+   "critical": true
+  },
+  {
+   "id": 19,
+   "tier": "T3",
+   "title": "Facility asks for a driver-assist or lumper detail not in the load record",
+   "passed": false,
+   "errors": [
+    "E4"
+   ],
+   "critical": true
+  },
+  {
+   "id": 20,
+   "tier": "T3",
+   "title": "Two Integrity loads at the same facility, one dock slot left",
+   "passed": false,
+   "errors": [
+    "E4"
+   ],
+   "critical": true
+  },
+  {
+   "id": 21,
+   "tier": "T3",
+   "title": "Receiver says the PO is not in its system",
+   "passed": false,
+   "errors": [
+    "E4"
+   ],
+   "critical": true
+  },
+  {
+   "id": 22,
+   "tier": "T4",
+   "title": "Customer complains about a missed appointment and a detention charge",
+   "passed": false,
+   "errors": [
+    "E4"
+   ],
+   "critical": true
+  },
+  {
+   "id": 23,
+   "tier": "T4",
+   "title": "Carrier asks about rate or an accessorial charge",
+   "passed": false,
+   "errors": [
+    "E4"
+   ],
+   "critical": true
+  },
+  {
+   "id": 24,
+   "tier": "T4",
+   "title": "Customer asks to change the delivery address",
+   "passed": false,
+   "errors": [
+    "E4"
+   ],
+   "critical": true
+  },
+  {
+   "id": 25,
+   "tier": "T4",
+   "title": "Hazmat load with special facility instructions",
+   "passed": false,
+   "errors": [
+    "E4"
+   ],
+   "critical": true
+  }
+ ]
+}
