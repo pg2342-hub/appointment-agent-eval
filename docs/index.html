@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Appointment agent eval</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--fg:#000;--bg:#fff;--muted:#555;--line:#000;--soft:#f2f2f2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 Inter,Arial,sans-serif}
+main{max-width:1040px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:26px;margin:0 0 6px}h2{font-size:17px;margin:30px 0 8px}
+p{margin:6px 0}.muted{color:var(--muted)}a{color:#000}
+.checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px 16px;margin:10px 0}
+.checks label{display:flex;gap:8px;align-items:flex-start;cursor:pointer;padding:4px 0}
+.checks input{margin-top:3px;accent-color:#000;width:16px;height:16px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+button{font:inherit;font-size:13px;border:1px solid #000;background:#fff;color:#000;padding:5px 10px;cursor:pointer}
+button:hover{background:#000;color:#fff}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}
+.tile{border:1px solid #000;padding:10px 12px}.tile .n{font-size:24px;font-weight:700}.tile .l{font-size:12px;color:var(--muted)}
+.tile.gate.pass{background:#fff}.tile.gate.fail{background:#000;color:#fff}.tile.gate.fail .l{color:#ddd}
+.wrap{overflow-x:auto;border:1px solid #000}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:760px}
+th,td{border-bottom:1px solid #ccc;padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--soft);position:sticky;top:0}
+tr.fail td{background:#fafafa}tr.fail td.res{font-weight:700}
+.crit{font-weight:700;text-decoration:underline}
+code{font-size:12px}
+footer{margin-top:36px;font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>Appointment agent eval</h1>
+<p>A runnable version of the 25-case eval set from my appointment agent spec for Runbook. The agent books and reschedules pickup and delivery appointments for a freight brokerage, and it only writes to the TMS without a coordinator's review once it passes the gate below. All data is constructed test data.</p>
+<p class="muted">Switch checks off to see which cases catch the gap. Every combination of the 12 checks was run through the same grader as the <a href="https://github.com/pg2342-hub/appointment-agent-eval">code on GitHub</a> (three runs per case).</p>
+
+<h2>Agent checks</h2>
+<div class="btns">
+  <button data-preset="all">Reference agent (all checks on)</button>
+  <button data-preset="none">All checks off</button>
+</div>
+<div class="checks" id="checks"></div>
+
+<div class="tiles" id="tiles"></div>
+<p class="muted" id="gate-note">Gate: 24 of 25 cases on all three runs, zero critical errors, T1-T2 at 14 of 15 or better, T3-T4 at 10 of 10.</p>
+
+<h2>Cases</h2>
+<div class="wrap"><table>
+<thead><tr><th>#</th><th>Tier</th><th>Case</th><th>Correct outcome</th><th>Result</th></tr></thead>
+<tbody id="rows"></tbody>
+</table></div>
+
+<h2>Error types</h2>
+<p><b>E1</b> wrong request type or path · <b>E2</b> missing or wrong field (load, PO, facility) · <span class="crit">E3</span> wrong appointment written, including a duplicate or a booking on the wrong load (critical) · <span class="crit">E4</span> should have handed off and did not (critical) · <b>E5</b> handed off when it could have finished · <b>E6</b> correct, but the log or confirmation is wrong.</p>
+<p><b>Tiers</b> T1 clean (7) · T2 messy but in scope (8) · T3 needs judgment, hand off (6) · T4 out of scope (4).</p>
+
+<footer>Built by Pranav Gudise. The reference agent reads structured facts, not raw email, so its 25 of 25 shows the spec's rules can be written as code and the grader agrees with a correct policy; it is not a claim about a model. Source and README: <a href="https://github.com/pg2342-hub/appointment-agent-eval">github.com/pg2342-hub/appointment-agent-eval</a>.</footer>
+</main>
+<script src="results.js"></script>
+<script>
+const R=window.RESULTS, B64="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const LABELS={merge:"Merge facts split across emails",po_match:"Match the PO and the facility together",handoff:"Hand-off rule (scope, hazmat, conflicts, deadlines)",fcfs:"Recognize first-come, first-served receivers",dedupe:"Do not book on top of a customer booking",calendar:"Facility days and holidays",notice:"Facility notice rules",timezone:"Convert time zones",transit:"Transit time and carrier ETA",window:"Stay inside the customer window",reply:"Read the facility's counter-offer",fallback:"Retry a failed portal, then email"};
+const box=document.getElementById("checks");
+R.checks.forEach((c,i)=>{const l=document.createElement("label");l.innerHTML=`<input type="checkbox" checked data-i="${i}"><span>${LABELS[c]||c}</span>`;box.appendChild(l)});
+const inputs=[...box.querySelectorAll("input")];
+function codes(ch){const v=B64.indexOf(ch);return R.codes.filter((_,i)=>v>>i&1)}
+function render(){
+  let mask=0;inputs.forEach((x,i)=>{if(!x.checked)mask|=1<<i});
+  const row=R.combos[mask];let passed=0,t12=0,t34=0,crit=0;const tb=[];
+  R.cases.forEach((c,k)=>{const e=codes(row[k]);const ok=e.length===0;const cr=e.some(x=>x==="E3"||x==="E4");
+    if(ok){passed++;if(c.tier<"T3")t12++;else t34++}if(cr)crit++;
+    tb.push(`<tr class="${ok?"":"fail"}"><td>${c.id}</td><td>${c.tier}</td><td>${c.title}</td><td>${c.expected}</td><td class="res">${ok?"pass":"FAIL "+e.map(x=>(x==="E3"||x==="E4")?`<span class="crit">${x}</span>`:x).join(" ")}</td></tr>`)});
+  document.getElementById("rows").innerHTML=tb.join("");
+  const gate=passed>=24&&crit===0&&t12>=14&&t34===10;
+  document.getElementById("tiles").innerHTML=
+   `<div class="tile"><div class="n">${passed} of 25</div><div class="l">cases passed on all three runs</div></div>`+
+   `<div class="tile"><div class="n">${t12} of 15</div><div class="l">T1-T2 bookings</div></div>`+
+   `<div class="tile"><div class="n">${t34} of 10</div><div class="l">T3-T4 hand-offs</div></div>`+
+   `<div class="tile"><div class="n">${crit}</div><div class="l">cases with a critical error</div></div>`+
+   `<div class="tile gate ${gate?"pass":"fail"}"><div class="n">${gate?"PASS":"FAIL"}</div><div class="l">go-live gate</div></div>`;
+}
+inputs.forEach(x=>x.addEventListener("change",render));
+document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>{inputs.forEach(x=>x.checked=b.dataset.preset==="all");render()}));
+render();
+</script>
+</body>
+</html>

@@ -4,6 +4,8 @@ A runnable version of the 25-case eval set in my appointment agent spec for Runb
 
 All data here is constructed test data. The TMS and the facility calendars are mocks (15 facilities across three time zones, 27 loads, dock hours, holidays, notice rules, booking channels, and booked slots). Nothing comes from Integrity's or Runbook's systems.
 
+**Demo page:** https://pg2342-hub.github.io/appointment-agent-eval/ lets you switch any of the 12 checks off and see which cases catch it and whether the gate still passes. It shows precomputed results for all 4,096 combinations, produced by `python3 docs/build_page.py` with the same grader.
+
 ## Run it
 
 ```
@@ -27,6 +29,7 @@ To score your own agent, write a class with `propose(case, tms)` that returns a 
 | `harness/grader.py` | Grades one proposal and returns error codes E1 to E6 from the spec. E3 (wrong appointment written, including a duplicate booking or a booking on the wrong load) and E4 (should have handed off) are critical. |
 | `run_eval.py` | Runs an agent over the cases and applies the gate. |
 | `ablation.py` | Runs the reference agent with one check switched off at a time. |
+| `docs/` | The demo page (`index.html`) and `build_page.py`, which writes `results.js`. |
 
 The gate: 24 of 25 cases on all three runs, zero critical errors, T1-T2 at 14 of 15 or better, and T3-T4 at 10 of 10.
 
