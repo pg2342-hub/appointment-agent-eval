@@ -4,7 +4,7 @@ A runnable version of the 25-case eval set in my appointment agent spec for Runb
 
 All data here is constructed test data. The TMS and the facility calendars are mocks (15 facilities across three time zones, 27 loads, dock hours, holidays, notice rules, booking channels, and booked slots). Nothing comes from Integrity's or Runbook's systems.
 
-**Demo page:** https://pg2342-hub.github.io/appointment-agent-eval/ lets you switch any of the 12 checks off and see which cases catch it and whether the gate still passes. It shows precomputed results for all 4,096 combinations, produced by `python3 docs/build_page.py` with the same grader.
+**Demo page:** https://pg2342-hub.github.io/appointment-agent-eval lets you switch any of the 12 checks off and see which cases catch it and whether the gate still passes. It shows precomputed results for all 4,096 combinations, produced by `python3 docs/build_page.py` with the same grader.
 
 ## Run it
 
