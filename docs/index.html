@@ -1,38 +1,38 @@
 <!doctype html>
 <html lang="en">
 <head>
+<!-- demo-chrome --><meta name="theme-color" content="#f4f2ec"><link rel="icon" href="https://pranavgudise.dev/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="https://pranavgudise.dev/kit/demo.css"><!-- /demo-chrome -->
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Appointment agent eval</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--fg:#000;--bg:#fff;--muted:#555;--line:#000;--soft:#f2f2f2}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 Inter,Arial,sans-serif}
-main{max-width:1040px;margin:0 auto;padding:28px 16px 60px}
-h1{font-size:26px;margin:0 0 6px}h2{font-size:17px;margin:30px 0 8px}
-p{margin:6px 0}.muted{color:var(--muted)}a{color:#000}
-.checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px 16px;margin:10px 0}
-.checks label{display:flex;gap:8px;align-items:flex-start;cursor:pointer;padding:4px 0}
-.checks input{margin-top:3px;accent-color:#000;width:16px;height:16px}
-.btns{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
-button{font:inherit;font-size:13px;border:1px solid #000;background:#fff;color:#000;padding:5px 10px;cursor:pointer}
-button:hover{background:#000;color:#fff}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}
-.tile{border:1px solid #000;padding:10px 12px}.tile .n{font-size:24px;font-weight:700}.tile .l{font-size:12px;color:var(--muted)}
-.tile.gate.pass{background:#fff}.tile.gate.fail{background:#000;color:#fff}.tile.gate.fail .l{color:#ddd}
-.wrap{overflow-x:auto;border:1px solid #000}
-table{border-collapse:collapse;width:100%;font-size:13px;min-width:760px}
-th,td{border-bottom:1px solid #ccc;padding:6px 8px;text-align:left;vertical-align:top}
-th{background:var(--soft);position:sticky;top:0}
-tr.fail td{background:#fafafa}tr.fail td.res{font-weight:700}
-.crit{font-weight:700;text-decoration:underline}
-code{font-size:12px}
-footer{margin-top:36px;font-size:13px;color:var(--muted)}
+main{padding-bottom:24px}
+.muted{color:var(--ink-2);max-width:46em}
+.checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:4px 20px;margin:16px 0}
+.checks label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:6px 0;font-size:15px}
+.checks input{flex:none;margin-top:3px;accent-color:var(--green);width:17px;height:17px;min-height:0;padding:0}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 4px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin:32px 0 12px}
+.tile{border:1px solid var(--rule);border-radius:16px;padding:18px 20px}
+.tile .n{font:400 32px/1.15 var(--serif);font-variant-numeric:tabular-nums}
+.tile .l{font-size:14px;color:var(--ink-2);margin-top:6px}
+.tile.gate.pass{background:var(--green-wash);border-color:var(--green-wash);color:var(--green)}
+.tile.gate.pass .l{color:var(--green)}
+.tile.gate.fail{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.tile.gate.fail .l{color:rgb(244 242 236/.75)}
+.wrap{overflow-x:auto;margin:16px 0}
+table{font-size:14px;min-width:760px}
+tr.fail td{background:rgb(27 26 23/.03)}
+td.res{white-space:nowrap;font:500 13px/1.5 var(--mono)}
+tr:not(.fail) td.res{color:var(--green)}
+.crit{font-weight:500;text-decoration:underline;text-underline-offset:3px}
+main>footer{margin-top:56px;font-size:14px;color:var(--ink-2);max-width:46em}
 </style>
 </head>
 <body>
+<!-- demo-chrome --><header class="demo-top"><a class="demo-brand" href="https://pranavgudise.dev/"><svg class="demo-mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.25"/><g class="n"><path class="f" d="M15.5 8.5 L 13.4 13.4 L 8.5 15.5 L 10.6 10.6 Z"/></g><circle class="p" cx="12" cy="12" r=".7"/></svg><span>Pranav Gudise</span></a><a class="pill" href="https://github.com/pg2342-hub/appointment-agent-eval">Code on GitHub</a></header><!-- /demo-chrome -->
+
 <main>
 <h1>Appointment agent eval</h1>
 <p>A runnable version of the 25-case eval set from my appointment agent spec for Runbook. The agent books and reschedules pickup and delivery appointments for a freight brokerage, and it only writes to the TMS without a coordinator's review once it passes the gate below. All data is constructed test data.</p>
@@ -73,7 +73,7 @@ function render(){
   const row=R.combos[mask];let passed=0,t12=0,t34=0,crit=0;const tb=[];
   R.cases.forEach((c,k)=>{const e=codes(row[k]);const ok=e.length===0;const cr=e.some(x=>x==="E3"||x==="E4");
     if(ok){passed++;if(c.tier<"T3")t12++;else t34++}if(cr)crit++;
-    tb.push(`<tr class="${ok?"":"fail"}"><td>${c.id}</td><td>${c.tier}</td><td>${c.title}</td><td>${c.expected}</td><td class="res">${ok?"pass":"FAIL "+e.map(x=>(x==="E3"||x==="E4")?`<span class="crit">${x}</span>`:x).join(" ")}</td></tr>`)});
+    tb.push(`<tr class="${ok?"":"fail"}"><td>${c.id}</td><td>${c.tier}</td><td>${c.title}</td><td>${c.expected}</td><td class="res">${ok?"Pass":"Fail · "+e.map(x=>(x==="E3"||x==="E4")?`<span class="crit">${x}</span>`:x).join(" ")}</td></tr>`)});
   document.getElementById("rows").innerHTML=tb.join("");
   const gate=passed>=24&&crit===0&&t12>=14&&t34===10;
   document.getElementById("tiles").innerHTML=
@@ -87,5 +87,6 @@ inputs.forEach(x=>x.addEventListener("change",render));
 document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>{inputs.forEach(x=>x.checked=b.dataset.preset==="all");render()}));
 render();
 </script>
+<!-- demo-chrome --><footer class="demo-foot"><span>A working build by <a href="https://pranavgudise.dev/">Pranav Gudise</a>. Synthetic or public data only.</span><a href="https://github.com/pg2342-hub/appointment-agent-eval">github.com/pg2342-hub/appointment-agent-eval</a></footer><!-- /demo-chrome -->
 </body>
 </html>
