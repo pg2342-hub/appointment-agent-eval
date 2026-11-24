@@ -5,86 +5,277 @@
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Appointment agent eval</title>
+<title>Appointment Agent Eval</title>
+<meta name="description" content="A 25-case eval and go-live gate for an agent that books freight pickup and delivery appointments. Switch any of its 12 checks off and see which cases catch it and whether the gate still passes.">
 <style>
-main{padding-bottom:24px}
-.muted{color:var(--ink-2);max-width:46em}
-.checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:4px 20px;margin:16px 0}
-.checks label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:6px 0;font-size:15px}
-.checks input{flex:none;margin-top:3px;accent-color:var(--green);width:17px;height:17px;min-height:0;padding:0}
-.btns{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 4px}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin:32px 0 12px}
-.tile{border:1px solid var(--rule);border-radius:16px;padding:18px 20px}
-.tile .n{font:400 32px/1.15 var(--serif);font-variant-numeric:tabular-nums}
-.tile .l{font-size:14px;color:var(--ink-2);margin-top:6px}
-.tile.gate.pass{background:var(--green-wash);border-color:var(--green-wash);color:var(--green)}
-.tile.gate.pass .l{color:var(--green)}
-.tile.gate.fail{background:var(--ink);border-color:var(--ink);color:var(--paper)}
-.tile.gate.fail .l{color:rgb(244 242 236/.75)}
-.wrap{overflow-x:auto;margin:16px 0}
-table{font-size:14px;min-width:760px}
-tr.fail td{background:rgb(27 26 23/.03)}
-td.res{white-space:nowrap;font:500 13px/1.5 var(--mono)}
-tr:not(.fail) td.res{color:var(--green)}
-.crit{font-weight:500;text-decoration:underline;text-underline-offset:3px}
-main>footer{margin-top:56px;font-size:14px;color:var(--ink-2);max-width:46em}
+.head h1{margin:40px 0 14px}
+.head .lead{max-width:40em}
+/* verdict: the same 25 cases under the same gate, one square per case */
+.verdict{margin:36px 0 0;border:1px solid var(--rule);border-radius:16px;background:#fbfaf6;overflow:hidden}
+.vhead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px;padding:18px 24px;border-bottom:1px solid var(--rule)}
+.vhead h2{all:unset;font:400 22px/1.2 var(--serif)}
+.vhead p{margin:0;color:var(--ink-2);font-size:15px}
+.vhead p b{color:var(--ink)}
+.vrow,.arow{display:grid;grid-template-columns:minmax(0,15em) minmax(0,1fr) 7.5em 5.5em;align-items:center;gap:20px;padding:22px 24px}
+.vwho b,.awho b{display:block;font:400 20px/1.2 var(--serif)}
+.vwho span,.awho span{display:block;color:var(--ink-2);font-size:14px;line-height:1.4;margin-top:4px}
+.strip{display:grid;grid-template-columns:repeat(25,minmax(0,1fr));gap:4px}
+.cell{display:block;aspect-ratio:1;border-radius:4px;border:1.5px solid transparent;transition:transform .2s var(--ease),box-shadow .2s,background-color .25s}
+.cell.pass{background:var(--green)}
+.cell.fail{background:var(--paper);border-color:var(--ink)}
+.cell.crit{background:var(--ink)}
+.cell:hover,.cell:focus-visible,.cell.lit{transform:translateY(-3px);box-shadow:0 6px 12px -6px rgb(27 26 23/.5)}
+.vscore{font-variant-numeric:tabular-nums}
+.vscore b{font:400 44px/1 var(--serif)}
+.vscore span{display:block;color:var(--ink-2);font-size:13px;line-height:1.35;margin-top:4px}
+.gate{justify-self:end;display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:0 14px;border-radius:999px;font:500 13px/1 var(--mono);letter-spacing:.06em;white-space:nowrap}
+.gate.go{background:var(--green-wash);color:var(--green)}
+.gate.nogo{background:var(--ink);color:var(--paper)}
+.gate.sm{min-height:24px;padding:0 10px;font-size:11.5px}
+/* the four gate conditions */
+.terms{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-top:1px solid var(--rule-soft)}
+.term{padding:14px 18px 14px 24px;font-size:13.5px;color:var(--ink-2);display:flex;gap:10px;align-items:baseline}
+.term+.term{border-left:1px solid var(--rule-soft)}
+.term i{flex:none;width:10px;height:10px;border-radius:3px;background:var(--green);transform:translateY(1px)}
+.term.miss i{background:var(--ink)}
+.term b{color:var(--ink);font-variant-numeric:tabular-nums}
+.term.miss b{text-decoration:underline;text-underline-offset:3px}
+/* the control: twelve check switches inside the verdict card */
+.ctrl{padding:20px 24px 22px;border-top:1px solid var(--rule);background:rgb(27 26 23/.025)}
+.ctrl-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 20px;margin-bottom:14px}
+.ctrl-top h3{margin:0;font:500 15px/1.3 var(--sans)}
+.ctrl-top h3 span{font-weight:400;color:var(--ink-2)}
+.seg{display:flex;width:fit-content;max-width:100%;flex-wrap:wrap;gap:2px;padding:3px;border:1px solid var(--rule);border-radius:999px;margin:0;background:#fbfaf6}
+.seg button{min-height:34px;padding:0 14px;border:0;border-radius:999px;background:transparent;color:var(--ink-2);font:500 14px/1 var(--sans);cursor:pointer}
+.seg button span{font-weight:400;opacity:.8}
+.seg button[aria-checked=true]{background:var(--ink);color:var(--paper)}
+.checks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.chk,.chk[aria-pressed=true]{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;min-height:46px;padding:8px 14px 8px 10px;border:1px solid var(--rule);border-radius:12px;background:#fbfaf6;cursor:pointer;font-size:14.5px;line-height:1.3;transition:border-color .2s,background-color .2s}
+.chk:hover{border-color:var(--ink)}
+.chk:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.sw{flex:none;position:relative;width:30px;height:18px;border-radius:999px;background:var(--green);transition:background-color .2s}
+.sw::after{content:"";position:absolute;top:3px;left:15px;width:12px;height:12px;border-radius:50%;background:#fbfaf6;transition:left .2s var(--ease)}
+.chk[aria-pressed=true]{color:var(--ink)}
+.chk[aria-pressed=false]{background:transparent;color:var(--ink-2)}
+.chk[aria-pressed=false] .sw{background:rgb(27 26 23/.22)}
+.chk[aria-pressed=false] .sw::after{left:3px}
+.chk em{font-style:normal;margin-left:auto;font:400 12px/1 var(--mono);color:var(--ink-2);white-space:nowrap}
+.hint{margin:12px 0 0;font-size:13px;color:var(--ink-2)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 20px;padding:14px 24px;border-top:1px solid var(--rule);color:var(--ink-2);font-size:13px}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend i{width:12px;height:12px;border-radius:3px;border:1.5px solid transparent}
+.legend .pass{background:var(--green)}.legend .fail{border-color:var(--ink)}.legend .crit{background:var(--ink)}
+/* page body: content and a side column */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:56px;align-items:start;margin-top:8px}
+.side{position:sticky;top:24px;margin-top:64px;display:grid;gap:22px;font-size:14px;color:var(--ink-2)}
+.side h3{margin:0 0 6px;font:500 13px/1.3 var(--sans);color:var(--ink)}
+.side p{margin:0}
+.side nav a{display:block;padding:5px 0;color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--rule-soft)}
+.side nav a:hover{color:var(--ink)}
+.side pre{font-size:12px;margin:6px 0 0}
+.point{font-size:17px;max-width:40em;margin:0}
+.note{color:var(--ink-2);font-size:15px;max-width:44em;margin-top:14px}
+/* coverage matrix: one row per check switched off alone */
+.abl{border:1px solid var(--rule);border-radius:16px;background:#fbfaf6;overflow:hidden}
+.ahead{display:grid;grid-template-columns:minmax(0,15em) minmax(0,1fr) 9.5em;gap:20px;padding:12px 24px 0;font:400 11px/1 var(--mono);color:var(--ink-2)}
+.ahead .nums{display:grid;grid-template-columns:repeat(25,minmax(0,1fr));gap:4px;text-align:center}
+.arow{grid-template-columns:minmax(0,15em) minmax(0,1fr) 9.5em;padding:12px 24px;cursor:pointer}
+.arow:hover{background:rgb(27 26 23/.025)}
+.arow+.arow{border-top:1px solid var(--rule-soft)}
+.arow.thin .awho span{color:var(--ink)}
+.awho b{font:400 17px/1.25 var(--serif)}
+.awho span{font-size:13px}
+.arow .strip{gap:4px}
+.ascore{display:flex;align-items:center;justify-content:space-between;gap:10px;font:400 14px/1 var(--sans);color:var(--ink-2);font-variant-numeric:tabular-nums}
+.ascore b{font:400 24px/1 var(--serif);color:var(--ink)}
+.ascore small{display:block;font-size:12px;margin-top:3px}
+.n{font-family:var(--mono);font-size:13px}
+.tag{font:400 12px/1 var(--mono);border:1px solid var(--rule);border-radius:999px;padding:4px 8px;white-space:nowrap}
+#cases td.res{white-space:nowrap;font-weight:500}
+#cases tr.ok td.res{color:var(--green)}
+#cases tr.bad td{background:rgb(27 26 23/.03)}
+#cases tr.crit td.res::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--ink);margin-right:6px;vertical-align:1px}
+#cases tr.lit td{background:var(--green-wash)}
+#cases tr{scroll-margin-top:24px}
+.sev{font:500 12px/1 var(--mono);padding:4px 8px;border-radius:999px;border:1px solid var(--rule);white-space:nowrap}
+.sev-critical{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+@media (max-width:1000px){
+ .layout{grid-template-columns:minmax(0,1fr);gap:0}
+ .side{position:static;margin-top:48px;order:2}
+ .vrow{grid-template-columns:minmax(0,1fr) auto;gap:14px 16px}
+ .vrow .strip{grid-column:1/-1;grid-row:2}
+ .vscore{grid-row:3}.vrow .gate{grid-row:3}
+ .terms{grid-template-columns:1fr 1fr}
+ .term:nth-child(3){border-left:0}
+ .term:nth-child(n+3){border-top:1px solid var(--rule-soft)}
+ .checks{grid-template-columns:1fr 1fr}
+ .ahead{display:none}
+ .arow{grid-template-columns:minmax(0,1fr) auto;gap:10px 16px}
+ .arow .strip{grid-column:1/-1;grid-row:2}
+}
+@media (max-width:640px){
+ .vrow,.arow{padding-left:18px;padding-right:18px}.vhead,.ctrl,.legend{padding-left:18px;padding-right:18px}.term{padding:12px 18px}
+ .strip,.arow .strip{gap:3px}
+ .checks{grid-template-columns:1fr}
+ .terms{grid-template-columns:1fr}.term+.term{border-left:0;border-top:1px solid var(--rule-soft)}
+}
+@media (prefers-reduced-motion:reduce){.cell,.sw,.sw::after{transition:none}}
 </style>
 </head>
 <body>
 <!-- demo-chrome --><header class="demo-top"><a class="demo-brand" href="https://pranavgudise.dev/"><svg class="demo-mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.25"/><g class="n"><path class="f" d="M15.5 8.5 L 13.4 13.4 L 8.5 15.5 L 10.6 10.6 Z"/></g><circle class="p" cx="12" cy="12" r=".7"/></svg><span>Pranav Gudise</span></a><a class="pill" href="https://github.com/pg2342-hub/appointment-agent-eval">Code on GitHub</a></header><!-- /demo-chrome -->
 
 <main>
-<h1>Appointment agent eval</h1>
-<p>A runnable version of the 25-case eval set from my appointment agent spec for Runbook. The agent books and reschedules pickup and delivery appointments for a freight brokerage, and it only writes to the TMS without a coordinator's review once it passes the gate below. All data is constructed test data.</p>
-<p class="muted">Switch checks off to see which cases catch the gap. Every combination of the 12 checks was run through the same grader as the <a href="https://github.com/pg2342-hub/appointment-agent-eval">code on GitHub</a> (three runs per case).</p>
-
-<h2>Agent checks</h2>
-<div class="btns">
-  <button data-preset="all">Reference agent (all checks on)</button>
-  <button data-preset="none">All checks off</button>
+<div class="head">
+<h1>Appointment Agent Eval</h1>
+<p class="lead">A runnable version of the 25-case eval set from my appointment agent spec. The agent books and reschedules pickup and delivery appointments for a freight brokerage, and it only writes to the TMS without a coordinator's review once it passes the gate below.</p>
 </div>
-<div class="checks" id="checks"></div>
 
-<div class="tiles" id="tiles"></div>
-<p class="muted" id="gate-note">Gate: 24 of 25 cases on all three runs, zero critical errors, T1-T2 at 14 of 15 or better, T3-T4 at 10 of 10.</p>
+<section class="verdict" aria-labelledby="verdict-h">
+  <div class="vhead"><h2 id="verdict-h">Switch a check off, watch the gate</h2><p>Gate: <b>24 of 25</b> on all three runs, <b>zero</b> critical errors</p></div>
+  <div class="vrow">
+    <div class="vwho"><b id="who">Reference agent</b><span id="who-sub">All 12 checks on</span></div>
+    <div class="strip" id="strip" role="group" aria-label="Every case under the current checks"></div>
+    <div class="vscore"><b id="score">25</b><span>of 25 passed<br><span id="crit-n" style="display:inline;margin:0">0</span> critical</span></div>
+    <span class="gate go" id="gate" aria-live="polite">GO</span>
+  </div>
+  <div class="terms" id="terms"></div>
+  <div class="ctrl">
+    <div class="ctrl-top">
+      <h3>Agent checks <span id="on-n">12 of 12 on</span></h3>
+      <div class="seg" role="radiogroup" aria-label="Preset" id="preset">
+        <button type="button" role="radio" aria-checked="true" data-preset="all">Reference agent, all on</button>
+        <button type="button" role="radio" aria-checked="false" data-preset="none">All checks off</button>
+      </div>
+    </div>
+    <div class="checks" id="checks"></div>
+    <p class="hint">The count on each switch is how many cases catch that check when it is the only one off.</p>
+  </div>
+  <div class="legend"><span><i class="pass"></i>Passed on all three runs</span><span><i class="fail"></i>Failed</span><span><i class="crit"></i>Critical error (E3 or E4)</span><span>Each square is one case. Select one to read it.</span></div>
+</section>
 
-<h2>Cases</h2>
-<div class="wrap"><table>
+<div class="layout">
+<div class="content">
+
+<h2 id="coverage">Which case catches each check</h2>
+<p class="note" style="margin:0 0 16px">An eval set that still passes with a check switched off is not testing that check. Each row is the reference agent with one check off; an outlined or ink square is a case that caught it. Select a row to load it into the switches above.</p>
+<div class="abl" id="abl"></div>
+<p class="note">Seven of the twelve checks are each caught by a single case, the thinnest coverage and the first place to add cases built from a broker's own loads. Two checks can be switched off and the gate still passes. With the portal fallback off, the agent hands the request to a coordinator: a safe, low-severity miss and exactly what the one allowed miss is for. With the first-come, first-served check off, the agent books an appointment the receiver does not need: wasted work rather than a wrong write. Neither is critical, but a second case for each would stop either from slipping through.</p>
+
+<h2 id="every-case">Every case</h2>
+<div class="seg" role="radiogroup" aria-label="Filter by tier" id="tiers" style="margin-bottom:16px">
+  <button type="button" role="radio" aria-checked="true" data-t="all">All&nbsp; <span>25</span></button>
+  <button type="button" role="radio" aria-checked="false" data-t="T1">T1 Clean&nbsp; <span>7</span></button>
+  <button type="button" role="radio" aria-checked="false" data-t="T2">T2 Messy but in scope&nbsp; <span>8</span></button>
+  <button type="button" role="radio" aria-checked="false" data-t="T3">T3 Needs judgment, hand off&nbsp; <span>6</span></button>
+  <button type="button" role="radio" aria-checked="false" data-t="T4">T4 Out of scope&nbsp; <span>4</span></button>
+</div>
+<div class="scroll"><table id="cases">
 <thead><tr><th>#</th><th>Tier</th><th>Case</th><th>Correct outcome</th><th>Result</th></tr></thead>
 <tbody id="rows"></tbody>
 </table></div>
 
-<h2>Error types</h2>
-<p><b>E1</b> wrong request type or path · <b>E2</b> missing or wrong field (load, PO, facility) · <span class="crit">E3</span> wrong appointment written, including a duplicate or a booking on the wrong load (critical) · <span class="crit">E4</span> should have handed off and did not (critical) · <b>E5</b> handed off when it could have finished · <b>E6</b> correct, but the log or confirmation is wrong.</p>
-<p><b>Tiers</b> T1 clean (7) · T2 messy but in scope (8) · T3 needs judgment, hand off (6) · T4 out of scope (4).</p>
+<h2 id="meaning">What 25 of 25 means</h2>
+<p class="point">The reference agent reads structured facts, not raw email, so its 25 of 25 shows the spec's rules can be written as code and the grader agrees with a correct policy. It is not a claim about a model.</p>
+<p class="note">Every one of the 4,096 combinations of the 12 checks was run through the same grader as the code on GitHub, three runs per case, and a case passes only if it passes every run. The switches above read those precomputed results.</p>
 
-<footer>Built by Pranav Gudise. The reference agent reads structured facts, not raw email, so its 25 of 25 shows the spec's rules can be written as code and the grader agrees with a correct policy; it is not a claim about a model. Source and README: <a href="https://github.com/pg2342-hub/appointment-agent-eval">github.com/pg2342-hub/appointment-agent-eval</a>.</footer>
+<h2 id="errors">Error codes</h2>
+<div class="scroll"><table><thead><tr><th>Code</th><th>What went wrong</th><th>Severity</th></tr></thead><tbody>
+<tr><td class="n">E1</td><td>Wrong request type or path</td><td></td></tr>
+<tr><td class="n">E2</td><td>Missing or wrong field (load, PO, facility)</td><td></td></tr>
+<tr><td class="n">E3</td><td>Wrong appointment written, including a duplicate or a booking on the wrong load</td><td><span class="sev sev-critical">Critical</span></td></tr>
+<tr><td class="n">E4</td><td>Should have handed off and did not</td><td><span class="sev sev-critical">Critical</span></td></tr>
+<tr><td class="n">E5</td><td>Handed off when it could have finished</td><td></td></tr>
+<tr><td class="n">E6</td><td>Correct, but the log or confirmation is wrong</td><td></td></tr>
+</tbody></table></div>
+</div>
+
+<aside class="side" aria-label="About this build">
+  <nav aria-label="On this page"><a href="#verdict-h">Gate and checks</a><a href="#coverage">Which case catches each check</a><a href="#every-case">Every case</a><a href="#meaning">What 25 of 25 means</a><a href="#errors">Error codes</a></nav>
+  <div><h3>Data</h3><p>Constructed test data. The TMS and the facility calendars are mocks: 15 facilities across three time zones and 27 loads.</p></div>
+  <div><h3>Run it yourself</h3><p>Python 3.9+, standard library only.</p><pre>python3 run_eval.py --agent spec
+python3 run_eval.py --agent naive
+python3 ablation.py
+python3 docs/build_page.py</pre></div>
+  <div><a class="pill" href="https://github.com/pg2342-hub/appointment-agent-eval">Code on GitHub</a></div>
+</aside>
+</div>
 </main>
 <script src="results.js"></script>
 <script>
 const R=window.RESULTS, B64="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 const LABELS={merge:"Merge facts split across emails",po_match:"Match the PO and the facility together",handoff:"Hand-off rule (scope, hazmat, conflicts, deadlines)",fcfs:"Recognize first-come, first-served receivers",dedupe:"Do not book on top of a customer booking",calendar:"Facility days and holidays",notice:"Facility notice rules",timezone:"Convert time zones",transit:"Transit time and carrier ETA",window:"Stay inside the customer window",reply:"Read the facility's counter-offer",fallback:"Retry a failed portal, then email"};
-const box=document.getElementById("checks");
-R.checks.forEach((c,i)=>{const l=document.createElement("label");l.innerHTML=`<input type="checkbox" checked data-i="${i}"><span>${LABELS[c]||c}</span>`;box.appendChild(l)});
-const inputs=[...box.querySelectorAll("input")];
+const CRIT=new Set(["E3","E4"]);
+/* The page names no real business: the brokerage is "the broker" (the case data keeps its own wording). */
+R.cases.forEach(c=>{c.title=c.title.replace("Integrity's","the broker's").replace("Two Integrity loads","Two of the broker's loads")});
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function codes(ch){const v=B64.indexOf(ch);return R.codes.filter((_,i)=>v>>i&1)}
-function render(){
-  let mask=0;inputs.forEach((x,i)=>{if(!x.checked)mask|=1<<i});
-  const row=R.combos[mask];let passed=0,t12=0,t34=0,crit=0;const tb=[];
-  R.cases.forEach((c,k)=>{const e=codes(row[k]);const ok=e.length===0;const cr=e.some(x=>x==="E3"||x==="E4");
-    if(ok){passed++;if(c.tier<"T3")t12++;else t34++}if(cr)crit++;
-    tb.push(`<tr class="${ok?"":"fail"}"><td>${c.id}</td><td>${c.tier}</td><td>${c.title}</td><td>${c.expected}</td><td class="res">${ok?"Pass":"Fail · "+e.map(x=>(x==="E3"||x==="E4")?`<span class="crit">${x}</span>`:x).join(" ")}</td></tr>`)});
-  document.getElementById("rows").innerHTML=tb.join("");
-  const gate=passed>=24&&crit===0&&t12>=14&&t34===10;
-  document.getElementById("tiles").innerHTML=
-   `<div class="tile"><div class="n">${passed} of 25</div><div class="l">cases passed on all three runs</div></div>`+
-   `<div class="tile"><div class="n">${t12} of 15</div><div class="l">T1-T2 bookings</div></div>`+
-   `<div class="tile"><div class="n">${t34} of 10</div><div class="l">T3-T4 hand-offs</div></div>`+
-   `<div class="tile"><div class="n">${crit}</div><div class="l">cases with a critical error</div></div>`+
-   `<div class="tile gate ${gate?"pass":"fail"}"><div class="n">${gate?"PASS":"FAIL"}</div><div class="l">go-live gate</div></div>`;
+function grade(mask){
+  const row=R.combos[mask];let passed=0,t12=0,t34=0,crit=0;
+  const per=R.cases.map((c,k)=>{const e=codes(row[k]);const ok=!e.length;const cr=e.some(x=>CRIT.has(x));
+    if(ok){passed++;if(c.tier<"T3")t12++;else t34++}if(cr)crit++;return{e,ok,cr}});
+  return{per,passed,t12,t34,crit,gate:passed>=24&&crit===0&&t12>=14&&t34===10};
 }
-inputs.forEach(x=>x.addEventListener("change",render));
-document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>{inputs.forEach(x=>x.checked=b.dataset.preset==="all");render()}));
+const st=p=>p.ok?"pass":p.cr?"crit":"fail";
+const word=p=>p.ok?"passed":p.cr?"failed with a critical error":"failed";
+
+/* switches */
+const box=$("checks");
+R.checks.forEach((c,i)=>{const b=document.createElement("button");b.type="button";b.className="chk";b.dataset.i=i;b.setAttribute("aria-pressed","true");
+  const g=grade(1<<i);const n=g.per.filter(p=>!p.ok).length;
+  b.innerHTML=`<span class="sw" aria-hidden="true"></span><span>${LABELS[c]||c}</span><em>${n} ${n===1?"case":"cases"}</em>`;
+  b.title=`Caught by ${n} ${n===1?"case":"cases"} when switched off alone`;
+  b.addEventListener("click",()=>{b.setAttribute("aria-pressed",String(b.getAttribute("aria-pressed")!=="true"));render()});box.appendChild(b)});
+const sws=[...box.querySelectorAll(".chk")];
+const mask=()=>sws.reduce((m,b,i)=>b.getAttribute("aria-pressed")==="true"?m:m|1<<i,0);
+function setMask(m){sws.forEach((b,i)=>b.setAttribute("aria-pressed",String(!(m>>i&1))));render()}
+const presets=[...document.querySelectorAll("#preset button")];
+presets.forEach(b=>b.addEventListener("click",()=>setMask(b.dataset.preset==="all"?0:(1<<R.checks.length)-1)));
+
+/* strip cells for the verdict row */
+$("strip").innerHTML=R.cases.map(c=>`<a class="cell pass" href="#case-${c.id}" data-case="${c.id}"></a>`).join("");
+const cells=[...$("strip").children];
+
+function render(){
+  const m=mask(),g=grade(m),off=sws.filter(b=>b.getAttribute("aria-pressed")==="false").map(b=>LABELS[R.checks[b.dataset.i]]);
+  const full=(1<<R.checks.length)-1;
+  presets[0].setAttribute("aria-checked",String(m===0));presets[1].setAttribute("aria-checked",String(m===full));
+  $("on-n").textContent=`${12-off.length} of 12 on`;
+  $("who").textContent=m===0?"Reference agent":m===full?"Naive agent":"Reference agent, edited";
+  $("who-sub").textContent=m===0?"All 12 checks on":m===full?"Every check off; books whatever it can":off.length===1?`${off[0]} off`:`${off.length} checks off`;
+  $("score").textContent=g.passed;$("crit-n").textContent=g.crit;
+  const gt=$("gate");gt.textContent=g.gate?"GO":"NO-GO";gt.className="gate "+(g.gate?"go":"nogo");
+  g.per.forEach((p,k)=>{const c=R.cases[k];cells[k].className="cell "+st(p);cells[k].setAttribute("aria-label",`Case ${c.id} (${c.tier}) ${word(p)}`)});
+  const terms=[[g.passed>=24,`<b>${g.passed} of 25</b> passed, needs 24`],[g.crit===0,`<b>${g.crit}</b> critical, needs 0`],[g.t12>=14,`<b>${g.t12} of 15</b> T1-T2 bookings, needs 14`],[g.t34===10,`<b>${g.t34} of 10</b> T3-T4 hand-offs, needs 10`]];
+  $("terms").innerHTML=terms.map(([ok,t])=>`<div class="term${ok?"":" miss"}"><i aria-hidden="true"></i><span>${t}<span class="vh">${ok?" (held)":" (missed)"}</span></span></div>`).join("");
+  $("rows").innerHTML=R.cases.map((c,k)=>{const p=g.per[k];
+    const res=p.ok?"Pass":"Fail · "+p.e.join(", ")+(p.cr?" (critical)":"");
+    return `<tr id="case-${c.id}" data-tier="${c.tier}" class="${p.ok?"ok":"bad"}${p.cr?" crit":""}"><td class="n">${c.id}</td><td><span class="tag">${c.tier}</span></td><td>${esc(c.title)}</td><td>${esc(c.expected)}</td><td class="res">${res}</td></tr>`}).join("");
+  filter();
+}
+
+/* coverage rows: each check switched off alone */
+$("abl").innerHTML=`<div class="ahead" aria-hidden="true"><span>Check switched off</span><span class="nums">${R.cases.map(c=>`<span>${c.id}</span>`).join("")}</span><span>Passed</span></div>`+
+ R.checks.map((c,i)=>{const g=grade(1<<i);const caught=R.cases.filter((_,k)=>!g.per[k].ok).map(x=>x.id);
+  const by=caught.length===1?`caught by case ${caught[0]} only`:caught.length<=4?`caught by ${caught.join(", ")}`:`caught by ${caught.length} cases`;
+  return `<div class="arow${caught.length===1?" thin":""}" role="button" tabindex="0" data-i="${i}" aria-label="Load ${esc(LABELS[c])} off into the switches">
+  <div class="awho"><b>${LABELS[c]}</b><span>${by}</span></div>
+  <div class="strip">${g.per.map((p,k)=>`<span class="cell ${p.ok?"pass":p.cr?"crit":"fail"}" data-case="${R.cases[k].id}"></span>`).join("")}</div>
+  <div class="ascore"><span><b>${g.passed}</b>/25<small>${g.crit} critical</small></span><span class="gate sm ${g.gate?"go":"nogo"}">${g.gate?"GO":"NO-GO"}</span></div></div>`}).join("");
+document.querySelectorAll(".arow").forEach(r=>{const go=()=>{setMask(1<<+r.dataset.i);$("verdict-h").scrollIntoView({behavior:"smooth",block:"start"})};
+  r.addEventListener("click",go);r.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}})});
+
+/* tier filter */
+const tiers=[...document.querySelectorAll("#tiers button")];let tier="all";
+function filter(){document.querySelectorAll("#rows tr").forEach(r=>r.hidden=!(tier==="all"||r.dataset.tier===tier))}
+tiers.forEach(b=>b.addEventListener("click",()=>{tiers.forEach(x=>x.setAttribute("aria-checked",String(x===b)));tier=b.dataset.t;filter()}));
+
+/* a square links to its row */
+document.addEventListener("mouseover",e=>{const c=e.target.closest(".cell");document.querySelectorAll(".cell.lit").forEach(x=>x.classList.remove("lit"));if(c)document.querySelectorAll(`.cell[data-case="${c.dataset.case}"]`).forEach(x=>x.classList.add("lit"))});
+$("strip").addEventListener("click",e=>{const c=e.target.closest(".cell");if(!c)return;tiers[0].click();
+  document.querySelectorAll("#rows tr.lit").forEach(r=>r.classList.remove("lit"));const row=$("case-"+c.dataset.case);row&&row.classList.add("lit")});
 render();
 </script>
 <!-- demo-chrome --><footer class="demo-foot"><span>A working build by <a href="https://pranavgudise.dev/">Pranav Gudise</a>. Synthetic or public data only.</span><a href="https://github.com/pg2342-hub/appointment-agent-eval">github.com/pg2342-hub/appointment-agent-eval</a></footer><!-- /demo-chrome -->
